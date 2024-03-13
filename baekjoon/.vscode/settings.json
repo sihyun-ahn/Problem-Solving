@@ -55,6 +55,8 @@
     "unordered_map": "cpp",
     "variant": "cpp",
     "algorithm": "cpp",
-    "set": "cpp"
+    "set": "cpp",
+    "stack": "cpp",
+    "map": "cpp"
   }
 }

@@ -1,39 +1,25 @@
 #include <iostream>
-#include <set>
-#include <cmath>
 using namespace std;
 
-long cnt = 0;
-
-void setDp(vector<vector<int>>& dp, int *operands, int i, int j, int n, int result) {
-    int sum = (j == 0) ? operands[0] : dp[i / 2 - 1][j - 1];
-    cout << i << " " << j << '\n';
-    if (i % 2 == 0) {
-        sum -= operands[j + 1];
-    } else {
-        sum += operands[j + 1];
-    }
-    if (j >= n - 3) {
-        if (sum == result) {
-            cnt++;
-            dp[i][j] = sum;
-        } else {
-            dp[i][j] = -1;
+void setDp(int *operands, long long **dp, int n) {
+  int tempAdd, tempSub;
+  dp[0][operands[0]]++;
+  for (int i = 1; i < n; i++) {
+    for (int j = 0; j < 21; j++) {
+      if (dp[i-1][j] > 0) {
+        tempAdd = j + operands[i];
+        tempSub = j - operands[i];
+        if (tempAdd >= 0 && tempAdd <= 20) {
+          dp[i][tempAdd] += dp[i-1][j];
         }
-        return;
+        if (tempSub >= 0 && tempSub <= 20) {
+          dp[i][tempSub] += dp[i-1][j];
+        }
+      }
     }
-
-    if (sum < 0 || sum > 20) {
-        dp[i][j] = -1;
-        return;
-    }
-    dp[i][j] = sum;
-    dp[2 * (i + 1) + 0][j + 1] = sum - operands[j + 2];
-    dp[2 * (i + 1) + 1][j + 1] = sum + operands[j + 2];
-
-    setDp(dp, operands, 2 * (i + 1), j + 1, n, result);
-    setDp(dp, operands, 2 * (i + 1) + 1, j + 1, n, result);
+  }
 }
+
 
 int main() {
   ios_base::sync_with_stdio(false);
@@ -43,21 +29,21 @@ int main() {
   bool isValid;
   cin >> n;
   int *operands = new int[n - 1]();
-    vector<vector<int>> dp((1LL << (n - 1)) - 2, vector<int>(n - 2, -1));
+  long long **dp = new long long*[n - 1]();
 
   for (int i = 0; i < n - 1; i++) {
-      cin >> operands[i];
+    dp[i] = new long long[21]();
+    cin >> operands[i];
   }
   cin >> result;
 
-  cout << "\ninitialized operands\n";
+  setDp(operands, dp, n-1);
+  cout << dp[n-2][result];
 
-  setDp(dp, operands, 0, 0, n, result);
-  setDp(dp, operands, 1, 0, n, result);
-
-  cout << cnt;
-
+  for (int i = 0; i < n - 1; i++) {
+    delete[] dp[i];
+  }
   delete[] operands;
-
+  delete[] dp;
   return 0;
 }
